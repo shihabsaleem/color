@@ -6,7 +6,7 @@ export const SITE_INFO = {
 };
 
 export const SEO_DATA = {
-  title: "KO LO RS — Color Palette Generator",
+  title: "color — Color Palette Generator",
   description: "Generate beautiful color palettes using HSL harmony, lock your brand colors, extract palettes from images, and check WCAG accessibility — all in one tool.",
   keywords: ["color palette", "color generator", "color harmony", "WCAG", "accessibility", "design tools"],
 };

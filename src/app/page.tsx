@@ -5,15 +5,15 @@ import { contrastRatio, gradeColor } from "@/lib/wcag";
 import { kMeans, samplePixelsFromImageData } from "@/lib/kmeans";
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
-const IconRefresh = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>;
-const IconLock = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2z"/><path d="M7 11V7a5 5 0 0 1 10 0v4" fill="none" stroke="currentColor" strokeWidth="2.5"/></svg>;
-const IconUnlock = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>;
-const IconCopy = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>;
-const IconImage = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>;
-const IconExport = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>;
-const IconEye = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>;
-const IconClose = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>;
-const IconSettings = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>;
+const IconRefresh = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 2v6h-6" /><path d="M3 12a9 9 0 0 1 15-6.7L21 8" /><path d="M3 22v-6h6" /><path d="M21 12a9 9 0 0 1-15 6.7L3 16" /></svg>;
+const IconLock = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2z" /><path d="M7 11V7a5 5 0 0 1 10 0v4" fill="none" stroke="currentColor" strokeWidth="2.5" /></svg>;
+const IconUnlock = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 9.9-1" /></svg>;
+const IconCopy = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>;
+const IconImage = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><path d="M21 15l-5-5L5 21" /></svg>;
+const IconExport = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>;
+const IconEye = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>;
+const IconClose = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>;
+const IconSettings = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" /></svg>;
 
 import { HARMONIES, SITE_INFO, UI_STRINGS, INITIAL_PALETTE } from "@/lib/data";
 
@@ -26,8 +26,8 @@ function getTextColor(rgb: { r: number; g: number; b: number }) {
 function Modal({ children, onClose, title }: { children: React.ReactNode; onClose: () => void; title: string }) {
   return (
     <div className="modal-overlay animate-fade" onClick={onClose}>
-      <div 
-        className="glass-panel animate-slide-up" 
+      <div
+        className="glass-panel animate-slide-up"
         style={{ padding: "32px", width: "100%", maxWidth: 540, position: "relative" }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -47,7 +47,7 @@ export default function Home() {
   const [swatches, setSwatches] = useState<ColorSwatch[]>(INITIAL_PALETTE);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [baseHex, setBaseHex] = useState("");
-  
+
   // Modals
   const [activeModal, setActiveModal] = useState<"image" | "wcag" | "export" | null>(null);
 
@@ -111,12 +111,12 @@ export default function Home() {
 
   return (
     <main style={{ width: "100%", height: "100%", display: "flex", position: "relative" }}>
-      
+
       {/* 5-Column Full Screen Layout */}
       {swatches.map((swatch, i) => {
         const textColor = getTextColor(swatch.rgb);
         const isCopied = copiedId === swatch.id;
-        
+
         return (
           <div
             key={swatch.id}
@@ -126,17 +126,17 @@ export default function Home() {
           >
             {/* Center Hover Controls */}
             <div className="swatch-controls" style={{ color: textColor }} onClick={(e) => e.stopPropagation()}>
-              <button 
-                className="swatch-btn" 
+              <button
+                className="swatch-btn"
                 onClick={(e) => { e.stopPropagation(); handleToggleLock(swatch.id); }}
                 title={swatch.locked ? UI_STRINGS.unlockTitle : UI_STRINGS.lockTitle}
                 style={{ color: textColor }}
               >
                 {swatch.locked ? <IconLock /> : <IconUnlock />}
               </button>
-              
-              <button 
-                className="swatch-btn" 
+
+              <button
+                className="swatch-btn"
                 onClick={(e) => { e.stopPropagation(); handleCopy(swatch.id, swatch.hex); }}
                 title={UI_STRINGS.copyHexTitle}
                 style={{ color: textColor }}
@@ -161,8 +161,8 @@ export default function Home() {
 
             {/* Bottom Labels */}
             <div style={{ padding: "0 24px 32px", textAlign: "center", color: textColor, pointerEvents: "none" }}>
-              <div style={{ 
-                opacity: isCopied ? 1 : 0, 
+              <div style={{
+                opacity: isCopied ? 1 : 0,
                 transform: isCopied ? "translateY(-8px)" : "translateY(10px)",
                 transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
                 fontWeight: 700,
@@ -176,7 +176,7 @@ export default function Home() {
               <div className="swatch-hex">{swatch.hex.replace("#", "")}</div>
               <div className="swatch-name">{swatch.name}</div>
             </div>
-            
+
             {/* Lock indicator strip if locked */}
             {swatch.locked && (
               <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 4, background: textColor, opacity: 0.3 }} />
@@ -187,7 +187,7 @@ export default function Home() {
 
       {/* Floating Dock Wrapper */}
       <div style={{ position: "fixed", bottom: 40, left: 0, right: 0, display: "flex", justifyContent: "center", pointerEvents: "none", zIndex: 50 }}>
-        <div 
+        <div
           className="glass-panel animate-dock"
           style={{
             display: "flex",
@@ -201,42 +201,42 @@ export default function Home() {
             pointerEvents: "auto",
           }}
         >
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginRight: 8, userSelect: "none" }}>
-          <img src={SITE_INFO.logoUrl} alt="Logo" width={28} height={28} style={{ objectFit: "contain" }} />
-          <span style={{ fontWeight: 800, fontSize: 18, letterSpacing: -0.5 }}>{SITE_INFO.name}</span>
-        </div>
-        
-        <div style={{ width: 1, height: 32, background: "var(--border)", margin: "0 8px" }} />
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginRight: 8, userSelect: "none" }}>
+            <img src={SITE_INFO.logoUrl} alt="Logo" width={32} height={32} style={{ objectFit: "contain" }} />
+            {/* <span style={{ fontWeight: 800, fontSize: 18, letterSpacing: -0.5 }}>{SITE_INFO.name}</span> */}
+          </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <select 
-            className="select custom-select" 
-            value={harmony} 
-            onChange={(e) => handleHarmonyChange(e.target.value as HarmonyType)}
-          >
-            {HARMONIES.map((h) => <option key={h.value} value={h.value}>{h.label}</option>)}
-          </select>
+          <div style={{ width: 1, height: 32, background: "var(--border)", margin: "0 8px" }} />
 
-          <button className="btn btn-primary" onClick={handleGenerate}>
-            <IconRefresh /> {UI_STRINGS.generateBtn}
-          </button>
-        </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <select
+              className="select custom-select"
+              value={harmony}
+              onChange={(e) => handleHarmonyChange(e.target.value as HarmonyType)}
+            >
+              {HARMONIES.map((h) => <option key={h.value} value={h.value}>{h.label}</option>)}
+            </select>
 
-        <div style={{ width: 1, height: 32, background: "var(--border)", margin: "0 8px" }} />
+            <button className="btn btn-primary" onClick={handleGenerate}>
+              <IconRefresh /> {UI_STRINGS.generateBtn}
+            </button>
+          </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <button className={`btn btn-icon ${activeModal === "image" ? "btn-primary" : ""}`} onClick={() => setActiveModal("image")} title={UI_STRINGS.imageToolTitle}>
-            <IconImage />
-          </button>
-          <button className={`btn btn-icon ${activeModal === "wcag" ? "btn-primary" : ""}`} onClick={() => setActiveModal("wcag")} title={UI_STRINGS.wcagToolTitle}>
-            <IconEye />
-          </button>
-          <button className={`btn btn-icon ${activeModal === "export" ? "btn-primary" : ""}`} onClick={() => setActiveModal("export")} title={UI_STRINGS.exportToolTitle}>
-            <IconExport />
-          </button>
+          <div style={{ width: 1, height: 32, background: "var(--border)", margin: "0 8px" }} />
+
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <button className={`btn btn-icon ${activeModal === "image" ? "btn-primary" : ""}`} onClick={() => setActiveModal("image")} title={UI_STRINGS.imageToolTitle}>
+              <IconImage />
+            </button>
+            <button className={`btn btn-icon ${activeModal === "wcag" ? "btn-primary" : ""}`} onClick={() => setActiveModal("wcag")} title={UI_STRINGS.wcagToolTitle}>
+              <IconEye />
+            </button>
+            <button className={`btn btn-icon ${activeModal === "export" ? "btn-primary" : ""}`} onClick={() => setActiveModal("export")} title={UI_STRINGS.exportToolTitle}>
+              <IconExport />
+            </button>
+          </div>
         </div>
       </div>
-    </div>
 
       {/* Modals */}
       {activeModal === "image" && (
@@ -244,7 +244,7 @@ export default function Home() {
           <ImageExtractor onExtract={(s) => { setSwatches(s); setActiveModal(null); }} />
         </Modal>
       )}
-      
+
       {activeModal === "wcag" && (
         <Modal title={UI_STRINGS.wcagModalTitle} onClose={() => setActiveModal(null)}>
           <WCAGChecker swatches={swatches} />
@@ -335,7 +335,7 @@ function WCAGChecker({ swatches }: { swatches: ColorSwatch[] }) {
           </select>
         </div>
       </div>
-      
+
       {res && (
         <>
           <div style={{ background: bg.hex, padding: 24, borderRadius: "var(--radius-md)", textAlign: "center", transition: "all 0.3s" }}>
@@ -359,7 +359,7 @@ function WCAGChecker({ swatches }: { swatches: ColorSwatch[] }) {
 function ExportPanel({ swatches }: { swatches: ColorSwatch[] }) {
   const css = `:root {\n${swatches.map((s, i) => `  --color-${i + 1}: ${s.hex};`).join("\n")}\n}`;
   const [copied, setCopied] = useState(false);
-  
+
   const handleCopy = () => {
     navigator.clipboard.writeText(css);
     setCopied(true);
