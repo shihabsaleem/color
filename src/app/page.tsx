@@ -14,12 +14,38 @@ const IconExport = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="n
 const IconEye = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>;
 const IconClose = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>;
 const IconSettings = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" /></svg>;
+const IconSearch = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>;
 
 import { HARMONIES, SITE_INFO, UI_STRINGS, INITIAL_PALETTE } from "@/lib/data";
 
 function getTextColor(rgb: { r: number; g: number; b: number }) {
   const luminance = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
   return luminance > 0.6 ? "rgba(0,0,0,0.85)" : "rgba(255,255,255,0.95)";
+}
+
+function parseColor(input: string): string | null {
+  const normalized = input.trim();
+  if (!normalized) return null;
+  if (/^#?([a-f\d]{3}|[a-f\d]{6})$/i.test(normalized)) {
+     let hex = normalized.startsWith("#") ? normalized : "#" + normalized;
+     if (hex.length === 4) {
+        hex = "#" + hex[1] + hex[1] + hex[2] + hex[2] + hex[3] + hex[3];
+     }
+     return hex;
+  }
+  if (typeof document !== "undefined") {
+    const testCanvas = document.createElement("canvas");
+    const testCtx = testCanvas.getContext("2d");
+    if (testCtx) {
+        testCtx.fillStyle = "#123456";
+        testCtx.fillStyle = normalized;
+        if (testCtx.fillStyle !== "#123456") {
+            return testCtx.fillStyle;
+        }
+        if (normalized.toLowerCase() === "#123456") return "#123456";
+    }
+  }
+  return null;
 }
 
 // ─── Modal Wrappers ───────────────────────────────────────────────────────────
@@ -47,20 +73,36 @@ export default function Home() {
   const [swatches, setSwatches] = useState<ColorSwatch[]>(INITIAL_PALETTE);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [baseHex, setBaseHex] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Modals
   const [activeModal, setActiveModal] = useState<"image" | "wcag" | "export" | null>(null);
 
   const handleGenerate = useCallback(() => {
-    if (baseHex) {
-      const hsl = hexToHsl(baseHex);
-      if (hsl) {
-        setSwatches((prev) => generatePalette(harmony, prev.filter((s) => s.locked), hsl));
-        return;
-      }
-    }
+    // Clear baseHex to fall back to random generation
+    setBaseHex("");
+    setSearchQuery("");
     setSwatches((prev) => regeneratePalette(prev, harmony));
-  }, [harmony, baseHex]);
+  }, [harmony]);
+
+  const handleSearchSubmit = useCallback((e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (searchQuery) {
+       const parsed = parseColor(searchQuery);
+       if (parsed) {
+          setBaseHex(parsed);
+          const hsl = hexToHsl(parsed);
+          if (hsl) {
+             setSwatches((prev) => generatePalette(harmony, prev.filter((s) => s.locked), hsl));
+             return;
+          }
+       }
+    }
+    // if empty or invalid, clear and generate random
+    setBaseHex("");
+    setSearchQuery("");
+    setSwatches((prev) => regeneratePalette(prev, harmony));
+  }, [searchQuery, harmony]);
 
   const handleHarmonyChange = useCallback((h: HarmonyType) => {
     setHarmony(h);
@@ -203,8 +245,35 @@ export default function Home() {
         >
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginRight: 8, userSelect: "none" }}>
             <img src={SITE_INFO.logoUrl} alt="Logo" width={32} height={32} style={{ objectFit: "contain" }} />
-            {/* <span style={{ fontWeight: 800, fontSize: 18, letterSpacing: -0.5 }}>{SITE_INFO.name}</span> */}
           </div>
+
+          <div style={{ width: 1, height: 32, background: "var(--border)", margin: "0 8px" }} />
+
+          <form onSubmit={handleSearchSubmit} style={{ display: "flex", alignItems: "center", position: "relative" }}>
+            <div style={{ position: "absolute", left: 10, color: "inherit", opacity: 0.5, pointerEvents: "none", display: "flex" }}>
+               <IconSearch />
+            </div>
+            <input 
+              type="text"
+              placeholder="Search color..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="input custom-input"
+              style={{
+                 padding: "8px 12px 8px 36px",
+                 borderRadius: "var(--radius-md)",
+                 border: "1px solid var(--border)",
+                 background: "rgba(255,255,255,0.08)",
+                 color: "inherit",
+                 outline: "none",
+                 width: "160px",
+                 fontSize: "14px",
+                 transition: "all 0.2s"
+              }}
+              onFocus={(e) => e.target.style.background = "rgba(255,255,255,0.12)"}
+              onBlur={(e) => e.target.style.background = "rgba(255,255,255,0.08)"}
+            />
+          </form>
 
           <div style={{ width: 1, height: 32, background: "var(--border)", margin: "0 8px" }} />
 
