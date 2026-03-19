@@ -79,6 +79,11 @@ export default function Home() {
   // Modals
   const [activeModal, setActiveModal] = useState<"image" | "wcag" | "export" | null>(null);
 
+  // Generate random palette on mount to overwrite static SSR palette
+  useEffect(() => {
+    setSwatches((prev) => regeneratePalette(prev, "random"));
+  }, []);
+
   const handleGenerate = useCallback(() => {
     // Clear baseHex to fall back to random generation
     setBaseHex("");
