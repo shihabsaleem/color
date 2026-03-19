@@ -1,488 +1,301 @@
-"use client";
-import React, { useState, useCallback, useRef, useEffect } from "react";
-import { ColorSwatch, HarmonyType, generatePalette, hexToHsl, colorName, hslToRgb, rgbToHex, regeneratePalette, rgbToHsl } from "@/lib/colorUtils";
-import { contrastRatio, gradeColor } from "@/lib/wcag";
-import { kMeans, samplePixelsFromImageData } from "@/lib/kmeans";
+import Link from "next/link";
+import React from "react";
+import { SITE_INFO } from "@/lib/data";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
-// ─── Icons ───────────────────────────────────────────────────────────────────
-const IconRefresh = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 2v6h-6" /><path d="M3 12a9 9 0 0 1 15-6.7L21 8" /><path d="M3 22v-6h6" /><path d="M21 12a9 9 0 0 1-15 6.7L3 16" /></svg>;
-const IconLock = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2z" /><path d="M7 11V7a5 5 0 0 1 10 0v4" fill="none" stroke="currentColor" strokeWidth="2.5" /></svg>;
-const IconUnlock = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 9.9-1" /></svg>;
-const IconCopy = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>;
-const IconImage = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><path d="M21 15l-5-5L5 21" /></svg>;
-const IconExport = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>;
-const IconEye = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>;
-const IconClose = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>;
-const IconSettings = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" /></svg>;
-const IconSearch = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>;
-const IconCamera = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" /><circle cx="12" cy="13" r="4" /></svg>;
+// ─── Palette data ─────────────────────────────────────────────────────────────
 
-import { HARMONIES, SITE_INFO, UI_STRINGS, INITIAL_PALETTE } from "@/lib/data";
+const HERO_SWATCHES = [
+  { color: "#264653", label: "#264653", dark: true },
+  { color: "#2a9d8f", label: "#2A9D8F", dark: true },
+  { color: "#e9c46a", label: "#E9C46A", dark: false },
+  { color: "#f4a261", label: "#F4A261", dark: false },
+  { color: "#e76f51", label: "#E76F51", dark: true },
+];
 
-function getTextColor(rgb: { r: number; g: number; b: number }) {
-  const luminance = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
-  return luminance > 0.6 ? "rgba(0,0,0,0.85)" : "rgba(255,255,255,0.95)";
-}
+const MINI_PALETTES = [
+  ["#03045e", "#0077b6", "#00b4d8", "#90e0ef", "#caf0f8"],
+  ["#10002b", "#3c096c", "#7b2d8b", "#c77dff", "#e0aaff"],
+  ["#1b1b2f", "#e94560", "#ffffff", "#f5a623", "#0f3460"],
+];
 
-function parseColor(input: string): string | null {
-  const normalized = input.trim();
-  if (!normalized) return null;
-  if (/^#?([a-f\d]{3}|[a-f\d]{6})$/i.test(normalized)) {
-     let hex = normalized.startsWith("#") ? normalized : "#" + normalized;
-     if (hex.length === 4) {
-        hex = "#" + hex[1] + hex[1] + hex[2] + hex[2] + hex[3] + hex[3];
-     }
-     return hex;
-  }
-  if (typeof document !== "undefined") {
-    const testCanvas = document.createElement("canvas");
-    const testCtx = testCanvas.getContext("2d");
-    if (testCtx) {
-        testCtx.fillStyle = "#123456";
-        testCtx.fillStyle = normalized;
-        if (testCtx.fillStyle !== "#123456") {
-            return testCtx.fillStyle;
-        }
-        if (normalized.toLowerCase() === "#123456") return "#123456";
-    }
-  }
-  return null;
-}
+const FEATURES = [
+  {
+    icon: "⚡",
+    title: "Instant generation",
+    desc: "Hit spacebar. Get a new palette. No loading, no friction — just flow.",
+  },
+  {
+    icon: "♿",
+    title: "WCAG compliance",
+    desc: "Automatic contrast checking against AA and AAA standards. Ship accessible designs faster.",
+  },
+  {
+    icon: "📦",
+    title: "Export anywhere",
+    desc: "CSS variables, Tailwind config, Figma tokens, JSON, or raw hex — your choice.",
+  },
+];
 
-// ─── Modal Wrappers ───────────────────────────────────────────────────────────
-function Modal({ children, onClose, title }: { children: React.ReactNode; onClose: () => void; title: string }) {
+// Items duplicated inside JSX for a seamless -50% ticker loop
+const TICKER_ITEMS = [
+  "Generate palettes",
+  "WCAG Contrast",
+  "Export CSS",
+  "Random palette",
+  "Lock colors",
+  "Gradient tool",
+  "Color blindness simulator",
+  "AI suggestions",
+];
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
+export default function LandingPage() {
   return (
-    <div className="modal-overlay animate-fade" onClick={onClose}>
+    <div className="min-h-screen flex flex-col overflow-x-hidden">
+      {/* Grain overlay */}
+      <div className="grain" aria-hidden="true" />
+
+      {/* Ambient glow */}
       <div
-        className="glass-panel animate-slide-up"
-        style={{ padding: "32px", width: "100%", maxWidth: 540, position: "relative" }}
-        onClick={(e) => e.stopPropagation()}
+        aria-hidden="true"
+        style={{
+          position: "fixed",
+          inset: 0,
+          pointerEvents: "none",
+          zIndex: 0,
+          background:
+            "radial-gradient(ellipse 80% 60% at 60% -10%, rgba(255,94,58,0.12) 0%, transparent 70%), " +
+            "radial-gradient(ellipse 60% 50% at 10% 80%, rgba(58,255,178,0.07) 0%, transparent 70%)",
+        }}
+      />
+
+      <Navbar />
+
+      {/* ── Hero ────────────────────────────────────────────────────────────── */}
+      <main
+        style={{
+          position: "relative",
+          zIndex: 1,
+          padding: "56px clamp(32px, 6vw, 96px) 0",
+          flex: 1,
+        }}
       >
-        <button className="btn btn-icon" onClick={onClose} style={{ position: "absolute", top: 20, right: 20 }}>
-          <IconClose />
-        </button>
-        <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 24, paddingRight: 32 }}>{title}</h2>
-        {children}
-      </div>
-    </div>
-  );
-}
+        {/*
+          Ghost big number — parent has position:relative (set above via style),
+          so this absolute child anchors to the hero section correctly.
+        */}
+        <div className="big-number" aria-hidden="true">
+          4.5M
+        </div>
 
-// ─── Main App ─────────────────────────────────────────────────────────────────
-export default function Home() {
-  const [harmony, setHarmony] = useState<HarmonyType>("random");
-  const [swatches, setSwatches] = useState<ColorSwatch[]>(INITIAL_PALETTE);
-  const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [baseHex, setBaseHex] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
+        {/* Live tag */}
+        <div className="fade-up-1" style={{ marginBottom: "2rem" }}>
+          <span className="tag">
+            <span className="tag-dot" />
+            Live · 4.5M palettes generated
+          </span>
+        </div>
 
-  // Modals
-  const [activeModal, setActiveModal] = useState<"image" | "wcag" | "export" | null>(null);
-
-  // Generate random palette on mount to overwrite static SSR palette
-  useEffect(() => {
-    setSwatches((prev) => regeneratePalette(prev, "random"));
-  }, []);
-
-  const handleGenerate = useCallback(() => {
-    // Clear baseHex to fall back to random generation
-    setBaseHex("");
-    setSearchQuery("");
-    setSwatches((prev) => regeneratePalette(prev, harmony));
-  }, [harmony]);
-
-  const handleSearchSubmit = useCallback((e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (searchQuery) {
-       const parsed = parseColor(searchQuery);
-       if (parsed) {
-          setBaseHex(parsed);
-          const hsl = hexToHsl(parsed);
-          if (hsl) {
-             setSwatches((prev) => generatePalette(harmony, prev.filter((s) => s.locked), hsl));
-             return;
-          }
-       }
-    }
-    // if empty or invalid, clear and generate random
-    setBaseHex("");
-    setSearchQuery("");
-    setSwatches((prev) => regeneratePalette(prev, harmony));
-  }, [searchQuery, harmony]);
-
-  const handleHarmonyChange = useCallback((h: HarmonyType) => {
-    setHarmony(h);
-    setSwatches((prev) => {
-      if (baseHex) {
-        const hsl = hexToHsl(baseHex);
-        if (hsl) return generatePalette(h, prev.filter((s) => s.locked), hsl);
-      }
-      return regeneratePalette(prev, h);
-    });
-  }, [baseHex]);
-
-  const handleToggleLock = useCallback((id: string) => {
-    setSwatches((prev) => prev.map((s) => s.id === id ? { ...s, locked: !s.locked } : s));
-  }, []);
-
-  const handleCopy = useCallback((id: string, text: string) => {
-    navigator.clipboard.writeText(text).then(() => {
-      setCopiedId(id);
-      setTimeout(() => setCopiedId(null), 1500);
-    });
-  }, []);
-
-  const handleColorChange = useCallback((id: string, hex: string) => {
-    const hsl = hexToHsl(hex);
-    if (!hsl) return;
-    const { r, g, b } = hslToRgb(hsl.h, hsl.s, hsl.l);
-    setSwatches((prev) =>
-      prev.map((s) =>
-        s.id === id
-          ? { ...s, hex, hsl, rgb: { r, g, b }, locked: true, name: colorName(hex) }
-          : s
-      )
-    );
-  }, []);
-
-  const handleScreenshot = useCallback(() => {
-    const canvas = document.createElement("canvas");
-    canvas.width = 1200;
-    canvas.height = 800;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const colWidth = canvas.width / swatches.length;
-    
-    swatches.forEach((swatch, i) => {
-      ctx.fillStyle = swatch.hex;
-      ctx.fillRect(i * colWidth, 0, colWidth, canvas.height);
-      
-      const textColor = getTextColor(swatch.rgb);
-      ctx.fillStyle = textColor;
-      ctx.font = "bold 24px sans-serif";
-      ctx.textAlign = "center";
-      
-      ctx.fillText(swatch.hex.toUpperCase(), i * colWidth + colWidth / 2, canvas.height - 80);
-      
-      ctx.font = "18px sans-serif";
-      ctx.fillText(swatch.name, i * colWidth + colWidth / 2, canvas.height - 40);
-    });
-
-    const link = document.createElement("a");
-    link.download = `palette-${Date.now()}.png`;
-    link.href = canvas.toDataURL("image/png");
-    link.click();
-  }, [swatches]);
-
-  // Keyboard shortcut
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.code === "Space" && (e.target as HTMLElement).tagName !== "INPUT" && !activeModal) {
-        e.preventDefault();
-        handleGenerate();
-      }
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [handleGenerate, activeModal]);
-
-  return (
-    <main style={{ width: "100%", height: "100%", display: "flex", position: "relative" }}>
-
-      {/* 5-Column Full Screen Layout */}
-      {swatches.map((swatch, i) => {
-        const textColor = getTextColor(swatch.rgb);
-        const isCopied = copiedId === swatch.id;
-
-        return (
-          <div
-            key={swatch.id}
-            className="swatch-col animate-fade"
-            style={{ backgroundColor: swatch.hex, animationDelay: `${i * 0.05}s` }}
-            onClick={() => handleCopy(swatch.id, swatch.hex)}
-          >
-            {/* Center Hover Controls */}
-            <div className="swatch-controls" style={{ color: textColor }} onClick={(e) => e.stopPropagation()}>
-              <button
-                className="swatch-btn"
-                onClick={(e) => { e.stopPropagation(); handleToggleLock(swatch.id); }}
-                title={swatch.locked ? UI_STRINGS.unlockTitle : UI_STRINGS.lockTitle}
-                style={{ color: textColor }}
-              >
-                {swatch.locked ? <IconLock /> : <IconUnlock />}
-              </button>
-
-              <button
-                className="swatch-btn"
-                onClick={(e) => { e.stopPropagation(); handleCopy(swatch.id, swatch.hex); }}
-                title={UI_STRINGS.copyHexTitle}
-                style={{ color: textColor }}
-              >
-                {isCopied ? <span style={{ fontSize: 18 }}>✓</span> : <IconCopy />}
-              </button>
-
-              <div style={{ position: "relative" }}>
-                <button className="swatch-btn" title={UI_STRINGS.editColorTitle} style={{ color: textColor }}>
-                  <IconSettings />
-                </button>
-                <input
-                  type="color"
-                  value={swatch.hex}
-                  onChange={(e) => handleColorChange(swatch.id, e.target.value)}
-                  style={{
-                    position: "absolute", inset: 0, opacity: 0, cursor: "pointer", width: "100%", height: "100%"
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Bottom Labels */}
-            <div style={{ padding: "0 24px 32px", textAlign: "center", color: textColor, pointerEvents: "none" }}>
-              <div style={{
-                opacity: isCopied ? 1 : 0,
-                transform: isCopied ? "translateY(-8px)" : "translateY(10px)",
-                transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
-                fontWeight: 700,
-                fontSize: 12,
-                textTransform: "uppercase",
-                letterSpacing: 2,
-                marginBottom: 8,
-              }}>
-                {UI_STRINGS.copiedToast}
-              </div>
-              <div className="swatch-hex">{swatch.hex.replace("#", "")}</div>
-              <div className="swatch-name">{swatch.name}</div>
-            </div>
-
-            {/* Lock indicator strip if locked */}
-            {swatch.locked && (
-              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 4, background: textColor, opacity: 0.3 }} />
-            )}
-          </div>
-        );
-      })}
-
-      {/* Floating Dock Wrapper */}
-      <div style={{ position: "fixed", bottom: 40, left: 0, right: 0, display: "flex", justifyContent: "center", pointerEvents: "none", zIndex: 50 }}>
-        <div
-          className="glass-panel animate-dock"
+        {/* Headline */}
+        <h1
+          className="fade-up-2 mb-6"
           style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 16,
-            padding: "16px 24px",
-            width: "max-content",
-            maxWidth: "calc(100vw - 32px)",
-            flexWrap: "wrap",
-            justifyContent: "center",
-            pointerEvents: "auto",
+            fontFamily: "'DM Sans', sans-serif",
+            fontWeight: 900,
+            fontSize: "clamp(2.8rem, 7vw, 7rem)",
+            lineHeight: 1.0,
+            letterSpacing: "-0.03em",
+            maxWidth: "900px",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 12, marginRight: 8, userSelect: "none" }}>
-            <img src={SITE_INFO.logoUrl} alt="Logo" width={32} height={32} style={{ objectFit: "contain" }} />
+          Build beautiful
+          <br />
+          <span
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontStyle: "italic",
+              fontWeight: 700,
+              color: "transparent",
+              backgroundImage: "linear-gradient(90deg, #ff5e3a, #ffce3a)",
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+            }}
+          >
+            color palettes
+          </span>
+          <br />
+          in seconds.
+        </h1>
+
+        {/* Sub-heading */}
+        <p
+          className="fade-up-3"
+          style={{
+            fontSize: "1.15rem",
+            color: "rgba(255,255,255,0.45)",
+            maxWidth: "480px",
+            lineHeight: 1.75,
+            fontWeight: 400,
+            marginBottom: "2.5rem",
+          }}
+        >
+          Generate, explore, and export stunning palettes. WCAG contrast
+          checking built in.
+        </p>
+
+        {/* CTAs */}
+        <div className="fade-up-4 flex flex-wrap gap-3" style={{ marginBottom: "5rem" }}>
+          <Link href="/generator" className="cta-primary">
+            Start generating →
+          </Link>
+          <Link href="/palettes" className="cta-ghost">
+            Explore palettes
+          </Link>
+        </div>
+
+        {/* ── Palette showcase ──────────────────────────────────────────────── */}
+        <div className="fade-up-5 w-full max-w-5xl mx-auto mb-0">
+          {/* Main large swatch strip */}
+          <div
+            className="flex h-52 md:h-72 rounded-2xl overflow-hidden mb-3"
+            style={{
+              gap: "4px",
+              boxShadow: "0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05)",
+            }}
+          >
+            {HERO_SWATCHES.map((s, i) => (
+              <div
+                key={i}
+                className="palette-card"
+                style={{ background: s.color }}
+              >
+                <span
+                  style={{
+                    position: "absolute",
+                    bottom: "10px",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    fontSize: "10px",
+                    fontWeight: 800,
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                    color: s.dark ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.6)",
+                    opacity: 0,           /* revealed via CSS .palette-card:hover */
+                    transition: "opacity 0.2s",
+                    whiteSpace: "nowrap",
+                    pointerEvents: "none",
+                  }}
+                >
+                  {s.label}
+                </span>
+              </div>
+            ))}
           </div>
 
-          <div style={{ width: 1, height: 32, background: "var(--border)", margin: "0 8px" }} />
-
-          <form onSubmit={handleSearchSubmit} style={{ display: "flex", alignItems: "center", position: "relative" }}>
-            <div style={{ position: "absolute", left: 10, color: "inherit", opacity: 0.5, pointerEvents: "none", display: "flex" }}>
-               <IconSearch />
-            </div>
-            <input 
-              type="text"
-              placeholder="Search color..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="input custom-input"
-              style={{
-                 padding: "8px 12px 8px 36px",
-                 borderRadius: "var(--radius-md)",
-                 border: "1px solid var(--border)",
-                 background: "rgba(255,255,255,0.08)",
-                 color: "inherit",
-                 outline: "none",
-                 width: "160px",
-                 fontSize: "14px",
-                 transition: "all 0.2s"
-              }}
-              onFocus={(e) => e.target.style.background = "rgba(255,255,255,0.12)"}
-              onBlur={(e) => e.target.style.background = "rgba(255,255,255,0.08)"}
-            />
-          </form>
-
-          <div style={{ width: 1, height: 32, background: "var(--border)", margin: "0 8px" }} />
-
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <select
-              className="select custom-select"
-              value={harmony}
-              onChange={(e) => handleHarmonyChange(e.target.value as HarmonyType)}
-            >
-              {HARMONIES.map((h) => <option key={h.value} value={h.value}>{h.label}</option>)}
-            </select>
-
-            <button className="btn btn-primary" onClick={handleGenerate}>
-              <IconRefresh /> {UI_STRINGS.generateBtn}
-            </button>
+          {/* Mini palette row */}
+          <div className="flex gap-2">
+            {MINI_PALETTES.map((row, ri) => (
+              <div
+                key={ri}
+                className="flex flex-1 h-11 rounded-xl overflow-hidden"
+                style={{ gap: "2px" }}
+              >
+                {row.map((c, ci) => (
+                  <div
+                    key={ci}
+                    className="flex-1 swatch cursor-pointer"
+                    style={{ background: c, borderRadius: "6px" }}
+                  />
+                ))}
+              </div>
+            ))}
           </div>
+        </div>
+      </main>
 
-          <div style={{ width: 1, height: 32, background: "var(--border)", margin: "0 8px" }} />
-
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <button className="btn btn-icon" onClick={handleScreenshot} title="Screenshot Palette">
-              <IconCamera />
-            </button>
-            <button className={`btn btn-icon ${activeModal === "image" ? "btn-primary" : ""}`} onClick={() => setActiveModal("image")} title={UI_STRINGS.imageToolTitle}>
-              <IconImage />
-            </button>
-            <button className={`btn btn-icon ${activeModal === "wcag" ? "btn-primary" : ""}`} onClick={() => setActiveModal("wcag")} title={UI_STRINGS.wcagToolTitle}>
-              <IconEye />
-            </button>
-            <button className={`btn btn-icon ${activeModal === "export" ? "btn-primary" : ""}`} onClick={() => setActiveModal("export")} title={UI_STRINGS.exportToolTitle}>
-              <IconExport />
-            </button>
-          </div>
+      {/* ── Ticker ──────────────────────────────────────────────────────────── */}
+      <div
+        style={{
+          overflow: "hidden",
+          borderTop: "1px solid rgba(255,255,255,0.06)",
+          borderBottom: "1px solid rgba(255,255,255,0.06)",
+          padding: "14px 0",
+          marginTop: "64px",
+          position: "relative",
+          zIndex: 1,
+        }}
+      >
+        {/*
+          .ticker-track animates translateX(0) → translateX(-50%).
+          We render TICKER_ITEMS twice so the second copy is an exact
+          visual clone of the first — when the first copy scrolls fully
+          off-screen the second seamlessly takes its place.
+        */}
+        <div className="ticker-track">
+          {[0, 1].map((copy) =>
+            TICKER_ITEMS.map((text, i) => (
+              <span
+                key={`${copy}-${i}`}
+                style={{
+                  padding: "0 28px",
+                  fontSize: "11px",
+                  fontWeight: 700,
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  color: "rgba(255,255,255,0.22)",
+                  whiteSpace: "nowrap",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "28px",
+                }}
+              >
+                {text}
+                <span style={{ color: "var(--accent)", fontSize: "10px" }}>✦</span>
+              </span>
+            ))
+          )}
         </div>
       </div>
 
-      {/* Modals */}
-      {activeModal === "image" && (
-        <Modal title={UI_STRINGS.imageModalTitle} onClose={() => setActiveModal(null)}>
-          <ImageExtractor onExtract={(s) => { setSwatches(s); setActiveModal(null); }} />
-        </Modal>
-      )}
-
-      {activeModal === "wcag" && (
-        <Modal title={UI_STRINGS.wcagModalTitle} onClose={() => setActiveModal(null)}>
-          <WCAGChecker swatches={swatches} />
-        </Modal>
-      )}
-
-      {activeModal === "export" && (
-        <Modal title={UI_STRINGS.exportModalTitle} onClose={() => setActiveModal(null)}>
-          <ExportPanel swatches={swatches} />
-        </Modal>
-      )}
-
-    </main>
-  );
-}
-
-// ─── Modal Components ─────────────────────────────────────────────────────────
-
-function ImageExtractor({ onExtract }: { onExtract: (swatches: ColorSwatch[]) => void }) {
-  const [isProcessing, setIsProcessing] = useState(false);
-  const fileRef = useRef<HTMLInputElement>(null);
-
-  const processImage = (file: File) => {
-    if (!file.type.startsWith("image/")) return;
-    setIsProcessing(true);
-    const url = URL.createObjectURL(file);
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
-      const scale = Math.min(200 / img.width, 200 / img.height, 1);
-      canvas.width = Math.round(img.width * scale);
-      canvas.height = Math.round(img.height * scale);
-      const ctx = canvas.getContext("2d")!;
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      const clusters = kMeans(samplePixelsFromImageData(ctx.getImageData(0, 0, canvas.width, canvas.height), 3000), 5, 25);
-      onExtract(clusters.slice(0, 5).map((c, i) => {
-        const hex = rgbToHex(c.r, c.g, c.b);
-        return { id: `swatch-${i}`, hsl: rgbToHsl(c.r, c.g, c.b), hex, rgb: c, locked: false, name: colorName(hex) };
-      }));
-    };
-    img.src = url;
-  };
-
-  return (
-    <div
-      onClick={() => fileRef.current?.click()}
-      onDragOver={(e) => e.preventDefault()}
-      onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) processImage(f); }}
-      style={{
-        border: "2px dashed var(--border)", borderRadius: "var(--radius-lg)", padding: 40,
-        textAlign: "center", cursor: "pointer", background: "rgba(0,0,0,0.2)"
-      }}
-    >
-      {isProcessing ? (
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, alignItems: "center" }}>
-          <IconRefresh /> <p>Extracting colors safely...</p>
+      {/* ── Features ────────────────────────────────────────────────────────── */}
+      <section
+        style={{
+          position: "relative",
+          zIndex: 1,
+          padding: "80px clamp(32px, 6vw, 96px)",
+        }}
+      >
+        <div style={{ marginBottom: "3rem" }}>
+          <span className="tag" style={{ display: "inline-flex" }}>
+            Why use this
+          </span>
         </div>
-      ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 12, alignItems: "center", opacity: 0.8 }}>
-          <IconImage />
-          <p>Drop an image here or click to browse</p>
-        </div>
-      )}
-      <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={(e) => { const f = e.target.files?.[0]; if (f) processImage(f); }} />
-    </div>
-  );
-}
 
-function WCAGChecker({ swatches }: { swatches: ColorSwatch[] }) {
-  const [fgIdx, setFgIdx] = useState(0);
-  const [bgIdx, setBgIdx] = useState(swatches.length > 1 ? 1 : 0);
-  const fg = swatches[fgIdx], bg = swatches[bgIdx];
-  const res = fg && bg ? contrastRatio(fg.rgb, bg.rgb) : null;
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-      <div style={{ display: "flex", gap: 16 }}>
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
-          <label style={{ fontSize: 12, opacity: 0.6 }}>{UI_STRINGS.textColorLabel}</label>
-          <select className="select custom-select custom-select-wcag" value={fgIdx} onChange={(e) => setFgIdx(Number(e.target.value))}>
-            {swatches.map((s, i) => <option key={s.id} value={i}>{s.hex.toUpperCase()}</option>)}
-          </select>
-        </div>
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
-          <label style={{ fontSize: 12, opacity: 0.6 }}>Background</label>
-          <select className="select" value={bgIdx} onChange={(e) => setBgIdx(Number(e.target.value))}>
-            {swatches.map((s, i) => <option key={s.id} value={i}>{s.hex.toUpperCase()}</option>)}
-          </select>
-        </div>
-      </div>
-
-      {res && (
-        <>
-          <div style={{ background: bg.hex, padding: 24, borderRadius: "var(--radius-md)", textAlign: "center", transition: "all 0.3s" }}>
-            <div style={{ color: fg.hex, fontSize: 32, fontWeight: 700, lineHeight: 1 }}>{res.ratioDisplay}</div>
-            <div style={{ color: fg.hex, fontSize: 14, opacity: 0.8, marginTop: 8 }}>Sample Text ({res.grade})</div>
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-            <div style={{ padding: 12, background: "rgba(0,0,0,0.3)", borderRadius: "var(--radius-sm)", borderLeft: `3px solid ${res.aa_normal ? "#22c55e" : "#ef4444"}` }}>
-              AA Normal (4.5:1) — {res.aa_normal ? "Pass" : "Fail"}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
+          {FEATURES.map((f, i) => (
+            <div key={i} className="feature-card">
+              <div style={{ fontSize: "2rem", marginBottom: "14px", lineHeight: 1 }}>
+                {f.icon}
+              </div>
+              <div
+                style={{ fontWeight: 800, fontSize: "1.05rem", marginBottom: "8px", letterSpacing: "-0.01em" }}
+              >
+                {f.title}
+              </div>
+              <div
+                style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.9rem", lineHeight: 1.7 }}
+              >
+                {f.desc}
+              </div>
             </div>
-            <div style={{ padding: 12, background: "rgba(0,0,0,0.3)", borderRadius: "var(--radius-sm)", borderLeft: `3px solid ${res.aa_large ? "#22c55e" : "#ef4444"}` }}>
-              AA Large (3:1) — {res.aa_large ? "Pass" : "Fail"}
-            </div>
-          </div>
-        </>
-      )}
-    </div>
-  );
-}
+          ))}
+        </div>
+      </section>
 
-function ExportPanel({ swatches }: { swatches: ColorSwatch[] }) {
-  const css = `:root {\n${swatches.map((s, i) => `  --color-${i + 1}: ${s.hex};`).join("\n")}\n}`;
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(css);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h3 style={{ fontSize: 14 }}>CSS Variables</h3>
-        <button className="btn" onClick={handleCopy}>{copied ? "Copied!" : "Copy"}</button>
-      </div>
-      <pre style={{ background: "rgba(0,0,0,0.3)", padding: 16, borderRadius: "var(--radius-md)", fontSize: 13, fontFamily: "'JetBrains Mono', monospace", opacity: 0.9 }}>
-        {css}
-      </pre>
+      <Footer />
     </div>
   );
 }

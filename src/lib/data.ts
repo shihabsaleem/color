@@ -1,4 +1,4 @@
-import { HarmonyType, ColorSwatch } from "./colorUtils";
+import { HarmonyType, ColorSwatch, colorName } from "./colorUtils";
 
 export const SITE_INFO = {
   name: " ",
@@ -60,11 +60,10 @@ export const HARMONIES: { value: HarmonyType; label: string }[] = [
   { value: "random", label: "Random" },
 ];
 
-// Resolves random hydration mismatch in SSR Next.js App Router
 export const INITIAL_PALETTE: ColorSwatch[] = [
-  { id: "swatch-0", hex: "#a78bfa", hsl: { h: 255, s: 92, l: 76 }, rgb: { r: 167, g: 139, b: 250 }, locked: false, name: "Light Violet" },
-  { id: "swatch-1", hex: "#9595fb", hsl: { h: 240, s: 94, l: 78 }, rgb: { r: 149, g: 149, b: 251 }, locked: false, name: "Soft Blue" },
-  { id: "swatch-2", hex: "#839ffc", hsl: { h: 226, s: 96, l: 75 }, rgb: { r: 131, g: 159, b: 252 }, locked: false, name: "Blue" },
-  { id: "swatch-3", hex: "#71a2fc", hsl: { h: 219, s: 96, l: 71 }, rgb: { r: 113, g: 162, b: 252 }, locked: false, name: "Blue" },
-  { id: "swatch-4", hex: "#60a5fa", hsl: { h: 213, s: 94, l: 68 }, rgb: { r: 96, g: 165, b: 250 }, locked: false, name: "Light Blue" },
+  { id: "swatch-0", hex: "#a78bfa", hsl: { h: 255, s: 92, l: 76 }, rgb: { r: 167, g: 139, b: 250 }, locked: false, name: colorName("#a78bfa") },
+  { id: "swatch-1", hex: "#9595fb", hsl: { h: 240, s: 94, l: 78 }, rgb: { r: 149, g: 149, b: 251 }, locked: false, name: colorName("#9595fb") },
+  { id: "swatch-2", hex: "#839ffc", hsl: { h: 226, s: 96, l: 75 }, rgb: { r: 131, g: 159, b: 252 }, locked: false, name: colorName("#839ffc") },
+  { id: "swatch-3", hex: "#71a2fc", hsl: { h: 219, s: 96, l: 71 }, rgb: { r: 113, g: 162, b: 252 }, locked: false, name: colorName("#71a2fc") },
+  { id: "swatch-4", hex: "#60a5fa", hsl: { h: 213, s: 94, l: 68 }, rgb: { r: 96, g: 165, b: 250 }, locked: false, name: colorName("#60a5fa") },
 ];

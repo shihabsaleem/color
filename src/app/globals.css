@@ -1,6 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,700;0,9..40,900&family=Playfair+Display:ital,wght@1,700&display=swap');
+@import "tailwindcss";
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -13,17 +17,17 @@
   --border: rgba(255, 255, 255, 0.12);
   --text-primary: #ffffff;
   --text-secondary: rgba(255, 255, 255, 0.6);
-  --accent: #ffffff;
+  --accent: #ff5e3a;
+  --accent2: #ffce3a;
+  --accent3: #3affb2;
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-xl: 24px;
 }
 
-html, body {
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden; /* Prevent scrolling for full-screen layout */
+html,
+body {
   background: var(--bg-primary);
   color: var(--text-primary);
   font-family: 'Plus Jakarta Sans', sans-serif;
@@ -32,25 +36,124 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Animations */
+/* ─────────────────────────────────────────
+   KEYFRAMES  (all in one place, no duplicates)
+───────────────────────────────────────── */
+
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
+
 @keyframes slideUpFade {
-  from { opacity: 0; transform: translateY(20px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
+
 @keyframes dockReveal {
-  from { opacity: 0; transform: translateY(40px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.animate-fade { animation: fadeIn 0.3s ease both; }
-.animate-slide-up { animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.animate-dock { animation: dockReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) both 0.2s; }
+/* Single canonical fade-up used by landing hero */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
 
-/* Layout */
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Ticker — moves exactly -50% so a 2× duplicated track loops seamlessly */
+@keyframes ticker {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes pulse-dot {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.5;
+    transform: scale(0.8);
+  }
+}
+
+/* ─────────────────────────────────────────
+   UTILITY ANIMATIONS
+───────────────────────────────────────── */
+
+.animate-fade {
+  animation: fadeIn 0.3s ease both;
+}
+
+.animate-slide-up {
+  animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-dock {
+  animation: dockReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+}
+
+/* Landing hero staggered reveal — all use `both` so they hold the hidden
+   state before their delay fires and stay visible after finishing */
+.fade-up-1 {
+  animation: fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both;
+}
+
+.fade-up-2 {
+  animation: fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.18s both;
+}
+
+.fade-up-3 {
+  animation: fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.32s both;
+}
+
+.fade-up-4 {
+  animation: fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.46s both;
+}
+
+.fade-up-5 {
+  animation: fadeUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.60s both;
+}
+
+/* ─────────────────────────────────────────
+   LAYOUT — generator page
+───────────────────────────────────────── */
+
 .main-container {
   width: 100%;
   height: 100%;
@@ -59,7 +162,7 @@ html, body {
   position: relative;
 }
 
-/* Swatch Column Flex Magic */
+/* Swatch columns */
 .swatch-col {
   flex: 1;
   transition: flex 0.4s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.4s ease;
@@ -69,13 +172,13 @@ html, body {
   flex-direction: column;
   justify-content: flex-end;
   align-items: center;
-  padding-bottom: 20vh; /* Space for the dock */
+  padding-bottom: 20vh;
 }
+
 .swatch-col:hover {
   flex: 1.15;
 }
 
-/* Controls overlaying the column */
 .swatch-controls {
   position: absolute;
   top: 50%;
@@ -88,6 +191,7 @@ html, body {
   transition: opacity 0.25s ease;
   z-index: 10;
 }
+
 .swatch-col:hover .swatch-controls {
   opacity: 1;
 }
@@ -96,6 +200,7 @@ html, body {
   .main-container {
     flex-direction: column;
   }
+
   .swatch-col {
     flex-direction: row;
     padding-bottom: 0;
@@ -103,10 +208,15 @@ html, body {
     justify-content: space-between;
     padding: 0 20px;
   }
+
   .swatch-controls {
     flex-direction: row;
   }
 }
+
+/* ─────────────────────────────────────────
+   SWATCH BUTTON
+───────────────────────────────────────── */
 
 .swatch-btn {
   width: 44px;
@@ -120,51 +230,62 @@ html, body {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.2s, transform 0.2s;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
+
 .swatch-btn:hover {
   background: rgba(0, 0, 0, 0.3);
   transform: scale(1.08);
 }
+
 .swatch-btn:active {
   transform: scale(0.95);
 }
 
-/* Custom Select Dropdowns */
+/* ─────────────────────────────────────────
+   CUSTOM SELECT
+───────────────────────────────────────── */
+
 .custom-select {
   border: none;
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.05);
   color: var(--text-primary);
   appearance: none;
   cursor: pointer;
   outline: none;
   padding: 8px 16px;
   border-radius: var(--radius-md);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: background 0.2s;
   font-weight: 500;
   width: 160px;
 }
+
 .custom-select:hover {
-  background: rgba(255,255,255,0.08);
+  background: rgba(255, 255, 255, 0.08);
 }
-.custom-select:focus,
-.custom-select:active {
-  background: rgba(255,255,255,0.12);
-  box-shadow: 0 0 0 2px rgba(167,139,250,0.5);
+
+.custom-select:focus {
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.5);
 }
+
 .custom-select option {
   background-color: #1a1a24;
-  color: #ffffff;
+  color: #fff;
   padding: 12px;
   font-weight: 500;
 }
+
 .custom-select-wcag {
   width: 100%;
 }
 
-/* Custom Modals */
+/* ─────────────────────────────────────────
+   SWATCH HEX / LABELS
+───────────────────────────────────────── */
+
 .swatch-hex {
   font-family: 'JetBrains Mono', monospace;
   font-size: 2vw;
@@ -174,7 +295,7 @@ html, body {
   margin-top: 16px;
   transition: transform 0.2s ease;
 }
-/* Swatch Labels */
+
 .swatch-labels {
   padding: 0 24px 32px;
   text-align: center;
@@ -191,17 +312,22 @@ html, body {
     align-items: center;
     gap: 16px;
   }
+
   .swatch-hex {
     margin-top: 0 !important;
     font-size: 16px !important;
   }
+
   .swatch-name {
     margin-top: 0 !important;
     font-size: 12px;
   }
 }
 
-/* Glass panel (Dock & Modals) */
+/* ─────────────────────────────────────────
+   GLASS PANEL
+───────────────────────────────────────── */
+
 .glass-panel {
   background: var(--bg-panel);
   backdrop-filter: blur(24px);
@@ -211,7 +337,10 @@ html, body {
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
-/* Button */
+/* ─────────────────────────────────────────
+   BUTTONS
+───────────────────────────────────────── */
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -225,20 +354,23 @@ html, body {
   border: 1px solid transparent;
   background: transparent;
   color: var(--text-primary);
-  transition: all 0.2s ease;
+  transition: background 0.2s, transform 0.15s;
   white-space: nowrap;
 }
+
 .btn:hover {
   background: rgba(255, 255, 255, 0.08);
 }
+
 .btn:active {
   transform: scale(0.96);
 }
 
 .btn-primary {
-  background: #ffffff;
-  color: #000000;
+  background: #fff;
+  color: #000;
 }
+
 .btn-primary:hover {
   background: #e5e5e5;
 }
@@ -248,9 +380,13 @@ html, body {
   border-radius: var(--radius-md);
 }
 
-/* Input & Select */
-.input, .select {
-  background: rgba(0,0,0,0.4);
+/* ─────────────────────────────────────────
+   INPUT / SELECT
+───────────────────────────────────────── */
+
+.input,
+.select {
+  background: rgba(0, 0, 0, 0.4);
   border: 1px solid var(--border);
   color: var(--text-primary);
   border-radius: var(--radius-sm);
@@ -261,7 +397,12 @@ html, body {
   width: 100%;
   transition: border-color 0.2s;
 }
-.input:focus, .select:focus { border-color: rgba(255,255,255,0.4); }
+
+.input:focus,
+.select:focus {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
 .select {
   appearance: none;
   padding-right: 36px;
@@ -270,7 +411,10 @@ html, body {
   background-position: right 14px center;
 }
 
-/* Modal Overlay */
+/* ─────────────────────────────────────────
+   MODAL OVERLAY
+───────────────────────────────────────── */
+
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -281,4 +425,338 @@ html, body {
   align-items: center;
   justify-content: center;
   padding: 24px;
+}
+
+/* ─────────────────────────────────────────
+   NAVBAR
+───────────────────────────────────────── */
+
+.navbar {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  height: 64px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  .navbar {
+    padding: 0 64px;
+    height: 72px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .navbar {
+    padding: 0 96px;
+    height: 80px;
+  }
+}
+
+/* Logo — inline SVG / text approach; img fallback kept small */
+.logo-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+/* If you use an <img> for the logo */
+.logo-img {
+  height: 28px;
+  /* slightly larger than the original 24px */
+  max-height: 28px;
+  width: auto;
+  max-width: 120px;
+  /* prevents oversized images breaking layout */
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  opacity: 0.82;
+  display: block;
+}
+
+.logo-img-footer {
+  height: 46px;
+  max-height: 46px;
+  width: auto;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  opacity: 1;
+  display: block;
+}
+
+/* Fallback text logo shown when no image src resolves */
+.logo-text-mark {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 900;
+  font-size: 1.15rem;
+  letter-spacing: -0.035em;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+/* Coloured dots beside / instead of image logo */
+.logo-dots {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.logo-dots span {
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+
+.nav-center {
+  display: none;
+  /* hidden on mobile */
+  align-items: center;
+  gap: 32px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+@media (min-width: 768px) {
+  .nav-center {
+    display: flex;
+  }
+}
+
+.nav-link {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.38);
+  letter-spacing: 0.01em;
+  transition: color 0.18s;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.nav-link:hover {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.nav-signin {
+  display: none;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.38);
+  transition: color 0.18s;
+  padding: 8px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+}
+
+@media (min-width: 768px) {
+  .nav-signin {
+    display: block;
+  }
+}
+
+.nav-signin:hover {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.nav-signup {
+  font-size: 13.5px;
+  font-weight: 700;
+  background: white;
+  color: #0a0a0a;
+  padding: 8px 18px;
+  border-radius: 8px;
+  transition: opacity 0.18s, transform 0.15s;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.nav-signup:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+/* ─────────────────────────────────────────
+   GRAIN OVERLAY
+───────────────────────────────────────── */
+
+.grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+/* ─────────────────────────────────────────
+   LANDING PAGE — specific components
+───────────────────────────────────────── */
+
+/* Ghost hero number — parent must be position:relative */
+.big-number {
+  position: absolute;
+  top: -8px;
+  right: 0;
+  font-size: clamp(5rem, 14vw, 13rem);
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.07);
+  user-select: none;
+  pointer-events: none;
+  /* Clamp so it never overlaps the headline on narrow viewports */
+  max-width: 50vw;
+  overflow: hidden;
+}
+
+/* Tag pill */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 6px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(8px);
+  color: rgba(255, 255, 255, 0.6);
+  pointer-events: none;
+}
+
+.tag-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent3);
+  box-shadow: 0 0 6px var(--accent3);
+  animation: pulse-dot 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+/* Landing CTAs */
+.cta-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--accent);
+  color: white;
+  font-weight: 800;
+  font-size: 1rem;
+  padding: 14px 32px;
+  border-radius: 12px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 0 28px rgba(255, 94, 58, 0.30);
+}
+
+.cta-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(255, 94, 58, 0.45);
+}
+
+.cta-primary:active {
+  transform: translateY(0);
+}
+
+.cta-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 14px 28px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+
+.cta-ghost:hover {
+  color: white;
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Palette showcase — large swatch strip */
+.palette-card {
+  flex: 1;
+  transition: flex 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.palette-card:hover {
+  flex: 2 !important;
+}
+
+/* NOTE: .swatch on the landing page is different from generator .swatch-col.
+   This rule only applies the lift+shadow hover — no flex change. */
+.swatch {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.swatch:hover {
+  transform: translateY(-6px) scale(1.04);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+}
+
+/* Ticker */
+.ticker-track {
+  display: flex;
+  width: max-content;
+  /* critical — lets the inner spans size naturally */
+  animation: ticker 28s linear infinite;
+  will-change: transform;
+}
+
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+
+/* Feature cards */
+.feature-card {
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.025);
+  border-radius: 20px;
+  padding: 28px;
+  transition: border-color 0.3s, background 0.3s, transform 0.25s;
+}
+
+.feature-card:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-3px);
+}
+
+/* Divider */
+.divider {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }

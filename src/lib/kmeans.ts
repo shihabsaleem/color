@@ -36,7 +36,7 @@ export function kMeans(pixels: RGBPoint[], k: number, maxIter = 20): RGBPoint[] 
     if (centroids.length < k) centroids.push(pixels[pixels.length - 1]);
   }
 
-  let assignments = new Array(pixels.length).fill(0);
+  const assignments = new Array(pixels.length).fill(0);
   for (let iter = 0; iter < maxIter; iter++) {
     // Assign step
     let changed = false;

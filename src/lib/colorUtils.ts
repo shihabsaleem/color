@@ -1,4 +1,12 @@
 // HSL-based color generation utilities
+import nearestColor from "nearest-color";
+import { colornames as colors } from "color-name-list";
+
+const colorsMap = colors.reduce<{ [key: string]: string }>((o: { [key: string]: string }, { name, hex }: { name: string; hex: string }) => {
+  o[name] = hex;
+  return o;
+}, {});
+const nearest = nearestColor.from(colorsMap);
 
 export interface HSLColor {
   h: number; // 0-360
@@ -154,11 +162,14 @@ function generateHarmonyHues(base: HSLColor, type: HarmonyType): { h: number; s:
       ];
     case "random":
     default:
-      return Array.from({ length: 5 }, () => ({
-        h: Math.random() * 360,
-        s: 45 + Math.random() * 40,
-        l: 35 + Math.random() * 30,
-      }));
+      return [
+        { h, s, l },
+        ...Array.from({ length: 4 }, () => ({
+          h: Math.random() * 360,
+          s: 30 + Math.random() * 60,
+          l: 20 + Math.random() * 60,
+        })),
+      ];
   }
 }
 
@@ -227,36 +238,12 @@ export function regeneratePalette(
   });
 }
 
-// Simple color naming based on hue
+// 100% accurate color naming based on color-name-list
 export function colorName(hex: string): string {
-  const rgb = hexToRgb(hex);
-  if (!rgb) return "Unknown";
-  const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
-  const { h, s, l } = hsl;
-
-  if (l < 12) return "Obsidian";
-  if (l > 92) return "Snow";
-  if (s < 12) {
-    if (l < 30) return "Charcoal";
-    if (l < 55) return "Slate";
-    return "Pearl";
+  try {
+    const match = nearest(hex) as { name: string } | null;
+    return match ? match.name : "Unknown";
+  } catch {
+    return "Unknown";
   }
-
-  const hueNames: [number, string][] = [
-    [15, "Red"],
-    [40, "Orange"],
-    [70, "Yellow"],
-    [150, "Green"],
-    [175, "Teal"],
-    [200, "Cyan"],
-    [255, "Blue"],
-    [285, "Indigo"],
-    [320, "Violet"],
-    [345, "Pink"],
-    [360, "Red"],
-  ];
-  const hueName = hueNames.find(([max]) => h <= max)?.[1] ?? "Red";
-  if (l > 72) return `Light ${hueName}`;
-  if (l < 35) return `Dark ${hueName}`;
-  return hueName;
 }
